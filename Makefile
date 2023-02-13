@@ -8,12 +8,13 @@ CC = g++			# compiler to use
 
 LINKERFLAG = -lm
 
-STANDARD = -std=c++11
-INCLUDE = -I./include
+STANDARD = -std=c++17
+INCLUDE = -I./headers
+PERMISSIVE = -Wwrite-strings
 
 compile:
 	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE}  
+	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} ${PERMISSIVE}
 
 clean:
 	@echo "Cleaning up..."

@@ -3,6 +3,5 @@
 automata djkstra()
 {
     automata foo;
-    foo.alphabet = "asdfdsfds";
     return foo;
 }
