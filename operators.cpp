@@ -91,3 +91,8 @@ automata* charfunc (char* character, automata* a, automata* b)
     
     return out;
 }
+
+automata* questionMark (char* character, automata* a, automata* b)
+{
+    //TODO
+}

@@ -14,7 +14,7 @@ PERMISSIVE = -Wwrite-strings
 
 compile:
 	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} ${PERMISSIVE}
+	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE}
 
 clean:
 	@echo "Cleaning up..."

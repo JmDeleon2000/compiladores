@@ -3,5 +3,6 @@
 
 automata* kleene (char* character, automata* a, automata* b);
 automata* orop (char* character, automata* a, automata* b);
+automata* questionMark (char* character, automata* a, automata* b);
 automata* concat (char* character, automata* a, automata* b);
 automata* charfunc (char* character, automata* a, automata* b);

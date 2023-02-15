@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 
 typedef long state;
 
@@ -26,7 +27,7 @@ typedef automata* (*definition) (char*, automata*, automata*);
 struct node
 {
     definition impl;
-    char* character;
+    std::string character;
     node* leftson;
     node* rightson;
 };

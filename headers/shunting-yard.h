@@ -1,4 +1,5 @@
 #pragma once
 #include "structs.h"
+#include <string>
 
-automata djkstra();
+node djkstra(std::string regex);
