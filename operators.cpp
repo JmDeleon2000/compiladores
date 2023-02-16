@@ -91,7 +91,6 @@ automata* charfunc (string character, automata* a, automata* b)
     trans.character = character[0];
     
     out->gamma.push_back(trans);
-    
     return out;
 }
 

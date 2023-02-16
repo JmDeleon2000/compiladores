@@ -35,6 +35,10 @@ int main(int argc, char* argv[])
 
     automata *bruh = createAutomata(a);
     
+#if img
+    cout << "Compiled with img" << endl;
+#endif
+
     cout <<"start\t"<< bruh->start
     <<"\taccept\t" << bruh->accept << endl;
     for (auto& trans:bruh->gamma)

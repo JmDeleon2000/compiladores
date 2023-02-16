@@ -2,6 +2,8 @@
 #include <vector>
 #include <string>
 
+
+
 typedef long state;
 
 state getNewID();

@@ -16,7 +16,6 @@ struct op
 };
 
 #define opcount 6
-#define log 0
 
 op ops[opcount];
 bool initialized = false;
