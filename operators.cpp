@@ -1,6 +1,9 @@
 
 #include "operators.h"
 
+using namespace std;
+
+
 state counter = 0;
 state getNewID()
 {
@@ -9,7 +12,7 @@ state getNewID()
 
 
 
-automata* orop (char* character, automata* a, automata* b)
+automata* orop (string character, automata* a, automata* b)
 {
     automata* out = new automata();
     out->start = a->start;
@@ -32,7 +35,7 @@ automata* orop (char* character, automata* a, automata* b)
 }
 
 
-automata* kleene (char* character, automata* a, automata* b)
+automata* kleene (string character, automata* a, automata* b)
 {
     automata* out = new automata();
     
@@ -54,7 +57,7 @@ automata* kleene (char* character, automata* a, automata* b)
 }
 
 
-automata* concat (char* character, automata* a, automata* b)
+automata* concat (string character, automata* a, automata* b)
 {
     automata* out = new automata();
     out->start = a->start;
@@ -76,7 +79,7 @@ automata* concat (char* character, automata* a, automata* b)
     return out;
 }
 
-automata* charfunc (char* character, automata* a, automata* b)
+automata* charfunc (string character, automata* a, automata* b)
 {
     automata* out = new automata();
     out->start = getNewID();
@@ -92,7 +95,7 @@ automata* charfunc (char* character, automata* a, automata* b)
     return out;
 }
 
-automata* questionMark (char* character, automata* a, automata* b)
+automata* questionMark (string character, automata* a, automata* b)
 {
     //TODO
 }

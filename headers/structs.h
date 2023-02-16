@@ -22,7 +22,7 @@ struct automata
 
 
 
-typedef automata* (*definition) (char*, automata*, automata*);
+typedef automata* (*definition) (std::string, automata*, automata*);
 
 struct node
 {

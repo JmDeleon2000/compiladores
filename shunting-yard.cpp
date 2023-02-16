@@ -1,19 +1,22 @@
 #include "shunting-yard.h"
 #include "operators.h"
 #include <vector>
+#include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
-
+void init() ;
 struct op
 {
     definition impl;
-    int priority = INT_MAX;
+    int priority = 100000;
     const char* literal;
     bool unary = false;
 };
 
 #define opcount 6
+#define log 0
 
 op ops[opcount];
 bool initialized = false;
@@ -27,24 +30,25 @@ bool getOP(char* a, op* out)
         while (ops[i].literal[j] == a[j]) //mientras sean iguales
         {
             j++;
-            if (ops[i].literal[j] == 0 && a[j] == 0) //si tienen el mismo largo
-                {
-                    out->impl = ops[i].impl;
-                    out->literal = ops[i].literal;
-                    out->priority = ops[i].priority;
-                    return true;
-                }
+
+            out->impl = ops[i].impl;
+            out->literal = ops[i].literal;
+            out->priority = ops[i].priority;
+            out->unary = ops[i].unary;
+            return true;
         }
     }
     return false;
 }
 
+inline node* doTree(op, vector<op>*, vector<node*>*);
+
 
 //WIP unarios y brackets
-node djkstra(string regex)
+node* djkstra(string regex)
 {
     if (!initialized) init();
-    node head;
+    
     vector<op>      opstack;
     vector<node*>   nodestack;
 
@@ -55,6 +59,11 @@ node djkstra(string regex)
     {
         if (getOP(&ch, currentOP))
         {
+#if log
+            cout << "Current OP:\t" << currentOP->literal 
+                << "\t" << currentOP->priority << "\t" 
+                << (bool)currentOP->unary << endl;
+#endif
             switch (currentOP->priority)
             {
                 case -1:
@@ -66,8 +75,14 @@ node djkstra(string regex)
                     !opstack.empty() && 
                     opstack.back().priority >= currentOP->priority)
                     {
+#if log
+                        cout <<"Poping bracket:\t";
+                        for (auto& bruh:opstack)
+                            cout << bruh.literal << "\t";
+                        cout << endl;
+#endif
                         if (opstack.empty())
-                            throw exception("Error léxico");
+                            throw invalid_argument("Error léxico");
                         tempOP = opstack.back();
                         opstack.pop_back();
                         
@@ -75,22 +90,27 @@ node djkstra(string regex)
                         node* b;
 
                         if (nodestack.empty())
-                            throw exception("Error léxico");
+                            throw invalid_argument("Error léxico");
                         b = nodestack.back();
                         nodestack.pop_back();
 
-                        node* father = new node();
-                        if (tempOP.priority == -1 && tempOP.impl)
+                        node* father; 
+
+                        if (tempOP.priority == -1)
+                            father = b;
+                        else if (tempOP.unary)
                         {
-                            foundOpen = true;
+                            father = new node();
+
                             father->character = tempOP.literal;
                             father->impl = tempOP.impl;
                             father->leftson = b;
                         }
-                        else
+                        else 
                         {
+                            father = new node();
                             if (nodestack.empty())
-                                throw exception("Error léxico");
+                                throw invalid_argument("Error léxico");
                             a = nodestack.back();
                             nodestack.pop_back();
 
@@ -107,30 +127,18 @@ node djkstra(string regex)
                         opstack.back().priority > 0 && //no es un paréntesis que abre
                         opstack.back().priority >= currentOP->priority) //el actual tiene menor presedencia
                         {
+#if log
+                            cout <<"Poping priority:\t";
+                            for (auto& bruh:opstack)
+                                cout << bruh.literal << "\t";
+                            cout << endl;
+#endif
                             if (opstack.empty())
-                                throw exception("Error léxico");
+                                throw invalid_argument("Error léxico");
                             tempOP = opstack.back();
                             opstack.pop_back();
 
-                            node* a = nullptr;
-                            node* b = nullptr;
-
-
-                            if (nodestack.empty())
-                                throw exception("Error léxico");
-                            b = nodestack.back();
-                            nodestack.pop_back();
-                            if (nodestack.empty())
-                                throw exception("Error léxico");
-                            a = nodestack.back();
-                            nodestack.pop_back();
-
-                            node* father = new node();
-                            father->character = tempOP.literal;
-                            father->impl = tempOP.impl;
-                            father->leftson = a;
-                            father->rightson = b;
-
+                            node* father = doTree(tempOP, &opstack, &nodestack);
                             nodestack.push_back(father);
                         }
                     opstack.push_back(*currentOP);
@@ -139,14 +147,26 @@ node djkstra(string regex)
         }
         else
         {
+#if log
+            cout << "Litnode:\t" << ch << endl;
+#endif
             node* litnode = new node();
             litnode->character = ch;
             litnode->impl = charfunc;
             nodestack.push_back(litnode);
         }
     }
+
+    while (!opstack.empty())
+    {
+        tempOP = opstack.back();
+        opstack.pop_back();
+
+        node* father = doTree(tempOP, &opstack, &nodestack);
+        nodestack.push_back(father);
+    }
     
-    return head;
+    return nodestack.back();
 }
 
 // operators        = "*?.|";
@@ -165,7 +185,7 @@ void init()
     ops[2].literal  = "?";
     ops[2].priority = 4;
     ops[2].impl = questionMark;
-    ops[3].unary = true;
+    ops[2].unary = true;
 
     ops[3].literal  = "*";
     ops[3].priority = 5;
@@ -179,4 +199,41 @@ void init()
     ops[5].literal  = ")";
     ops[5].priority = -2;
     ops[5].impl = 0;
+
+    initialized = true;
+}
+
+inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
+{
+    node* a = nullptr;
+    node* b = nullptr;
+
+    if (nodestack->empty())
+        throw invalid_argument("Error léxico1");
+    b = nodestack->back();
+    nodestack->pop_back();
+
+    node *father;
+    if (tempOP.unary)
+    {
+        father = new node();
+    
+        father->character = tempOP.literal;
+        father->impl = tempOP.impl;
+        father->leftson = b;
+    }
+    else 
+    {
+        father = new node();
+        if (nodestack->empty())
+            throw invalid_argument("Error léxico2");
+        a = nodestack->back();
+        nodestack->pop_back();
+
+        father->character = tempOP.literal;
+        father->impl = tempOP.impl;
+        father->leftson = a;
+        father->rightson = b;
+    }
+    return father;
 }
