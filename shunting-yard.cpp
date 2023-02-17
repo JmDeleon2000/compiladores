@@ -191,18 +191,19 @@ void init()
     ops[3].impl = kleene;
     ops[3].unary = true;
 
-    ops[4].literal  = "(";
-    ops[4].priority = -1;
-    ops[4].impl = 0;
+    ops[4].literal  = "+";
+    ops[4].priority =  4;
+    ops[4].impl = plusfunc;
+    ops[4].unary = true;
 
-    ops[5].literal  = ")";
-    ops[5].priority = -2;
+    ops[5].literal  = "(";
+    ops[5].priority = -1;
     ops[5].impl = 0;
 
-    ops[6].literal  = "+";
-    ops[6].priority =  4;
-    ops[6].impl = plusfunc;
-    ops[6].unary = true;
+    ops[6].literal  = ")";
+    ops[6].priority = -2;
+    ops[6].impl = 0;
+
 
     initialized = true;
 }

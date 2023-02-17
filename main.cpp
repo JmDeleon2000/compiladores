@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     string regex;
     getline(file, regex);
 
-    cout << "Input:\t\t" << regex << "\n";
+    cout << "Input:\t\t" << regex.c_str() << "\n";
     cout << "Preprocessor:\t" << preprocess(regex) << endl;
 
     try{
@@ -54,12 +54,16 @@ int main(int argc, char* argv[])
 
 
 string nonconcatwith = ")|*?+";
-string nonconcat = "()|";
+string nonconcat = "(|";
 
 string preprocess(string regex)
 {
     string out = "";
     int i = 0;
+    size_t pos;
+    while ((pos = regex.find("ε")) != std::string::npos) 
+        regex.replace(pos, 1, "\0");
+    
     while (i < regex.size())
     {
         out += regex[i];
