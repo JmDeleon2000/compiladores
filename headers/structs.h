@@ -22,8 +22,6 @@ struct automata
     state accept;
 };
 
-
-
 typedef automata* (*definition) (std::string, automata*, automata*);
 
 struct node

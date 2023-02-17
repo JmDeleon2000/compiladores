@@ -8,7 +8,6 @@
 using namespace std;
 
 
-char* alphabet;
 
 
 string preprocess(string);
@@ -54,7 +53,7 @@ int main(int argc, char* argv[])
 }
 
 
-string nonconcatwith = ")|";
+string nonconcatwith = ")|*?+";
 string nonconcat = "()|";
 
 string preprocess(string regex)
@@ -74,9 +73,6 @@ string preprocess(string regex)
     return out;
 }
 
-
-
-
 void postorderprint(node* root)
 {
     if (root->leftson)
@@ -85,6 +81,7 @@ void postorderprint(node* root)
         postorderprint(root->rightson);
     cout << root->character << endl;
 }
+
 automata* createAutomata(node* root)
 {
     automata* left   = 0;
@@ -94,8 +91,12 @@ automata* createAutomata(node* root)
     if (root->rightson)
         right = createAutomata(root->rightson);
     automata *out = root->impl(root->character, left, right);
-    delete left;
-    delete right;
+
+    if (left)
+        delete left;
+    
+    if (right)
+        delete right;
 
     return out;
 }

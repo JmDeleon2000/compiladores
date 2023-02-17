@@ -22,7 +22,7 @@ img:
 
 log:
 	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} -D log
+	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} -D logYard
 
 
 

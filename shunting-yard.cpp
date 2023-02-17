@@ -15,7 +15,7 @@ struct op
     bool unary = false;
 };
 
-#define opcount 6
+#define opcount 7
 
 op ops[opcount];
 bool initialized = false;
@@ -58,7 +58,7 @@ node* djkstra(string regex)
     {
         if (getOP(&ch, currentOP))
         {
-#if log
+#if logYard
             cout << "Current OP:\t" << currentOP->literal 
                 << "\t" << currentOP->priority << "\t" 
                 << (bool)currentOP->unary << endl;
@@ -74,7 +74,7 @@ node* djkstra(string regex)
                     !opstack.empty() && 
                     opstack.back().priority >= currentOP->priority)
                     {
-#if log
+#if logYard
                         cout <<"Poping bracket:\t";
                         for (auto& bruh:opstack)
                             cout << bruh.literal << "\t";
@@ -126,7 +126,7 @@ node* djkstra(string regex)
                         opstack.back().priority > 0 && //no es un paréntesis que abre
                         opstack.back().priority >= currentOP->priority) //el actual tiene menor presedencia
                         {
-#if log
+#if logYard
                             cout <<"Poping priority:\t";
                             for (auto& bruh:opstack)
                                 cout << bruh.literal << "\t";
@@ -146,7 +146,7 @@ node* djkstra(string regex)
         }
         else
         {
-#if log
+#if logYard
             cout << "Litnode:\t" << ch << endl;
 #endif
             node* litnode = new node();
@@ -178,7 +178,7 @@ void init()
     ops[0].impl = orop;
 
     ops[1].literal  = ".";
-    ops[1].priority = 2;
+    ops[1].priority = 3;
     ops[1].impl = concat;
 
     ops[2].literal  = "?";
@@ -187,7 +187,7 @@ void init()
     ops[2].unary = true;
 
     ops[3].literal  = "*";
-    ops[3].priority = 5;
+    ops[3].priority = 4;
     ops[3].impl = kleene;
     ops[3].unary = true;
 
@@ -199,6 +199,11 @@ void init()
     ops[5].priority = -2;
     ops[5].impl = 0;
 
+    ops[6].literal  = "+";
+    ops[6].priority =  4;
+    ops[6].impl = plusfunc;
+    ops[6].unary = true;
+
     initialized = true;
 }
 
@@ -208,7 +213,7 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
     node* b = nullptr;
 
     if (nodestack->empty())
-        throw invalid_argument("Error léxico1");
+        throw invalid_argument("Error léxico");
     b = nodestack->back();
     nodestack->pop_back();
 
@@ -225,7 +230,7 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
     {
         father = new node();
         if (nodestack->empty())
-            throw invalid_argument("Error léxico2");
+            throw invalid_argument("Error léxico");
         a = nodestack->back();
         nodestack->pop_back();
 
