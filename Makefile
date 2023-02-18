@@ -16,15 +16,15 @@ compile:
 	@echo "Compile..."
 	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE}
 
-img:
-	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} -D img
 
 log:
 	@echo "Compile..."
 	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} -D logYard
 
-
+draw:
+	./main.o > "temp.gv.txt"
+	dot "temp.gv.txt" -Tpng:cairo:gd > "graph.png"
+	rm "temp.gv.txt"
 
 clean:
 	@echo "Cleaning up..."

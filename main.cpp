@@ -4,11 +4,12 @@
 #include "operators.h"
 #include <string>
 #include <fstream>
+#include <cstring>
 
 using namespace std;
 
 
-
+string header = "digraph finite_state_machine {\nfontname=%f\nnode [fontname=%f]\nedge [fontname=%f]\nrankdir=LR;\nnode [shape = doublecircle]; %a;\nnode [shape = circle];\n";
 
 string preprocess(string);
 
@@ -26,24 +27,49 @@ int main(int argc, char* argv[])
     string regex;
     getline(file, regex);
 
-    cout << "Input:\t\t" << regex.c_str() << "\n";
-    cout << "Preprocessor:\t" << preprocess(regex) << endl;
+    //cout << "Input:\t\t" << regex.c_str() << "\n";
+    //cout << "Preprocessor:\t" << preprocess(regex) << endl;
 
     try{
     node* a  = djkstra(preprocess(regex));
 
     automata *bruh = createAutomata(a);
     
-#if img
-    cout << "Compiled with img" << endl;
-#endif
 
-    cout <<"start\t"<< bruh->start
-    <<"\taccept\t" << bruh->accept << endl;
+    size_t pos;
+    while ((pos = header.find("%f")) != std::string::npos) 
+        header.replace(pos, 2, "\"Helvetica,Arial,sans-serif\"");
+
+    
+    while ((pos = header.find("%a")) != std::string::npos) 
+        header.replace(pos, 2, to_string(bruh->accept));
+
+    
+
+    string out = header;
+    string nodeformat = "%d-> %d [label = \"%c\"];\n";
+    string insertion;
+
+
+    char buff[100];
+
     for (auto& trans:bruh->gamma)
-        cout << trans.current << "\t==>\t" 
-        << trans.character << "\t==>\t" 
-        << trans.next << endl;
+    {
+        memset(buff, 0, sizeof(buff));
+        sprintf(buff, nodeformat.c_str(), trans.current, trans.next, trans.character);
+        out+= buff;
+    }
+
+    out+="}";
+
+    cout << out << endl;
+    
+    //cout <<"start\t"<< bruh->start
+    //<<"\taccept\t" << bruh->accept << endl;
+    //for (auto& trans:bruh->gamma)
+    //    cout << trans.current << "\t==>\t" 
+    //    << trans.character << "\t==>\t" 
+    //    << trans.next << endl;
 
     } catch(const invalid_argument& e)
     {
@@ -53,6 +79,7 @@ int main(int argc, char* argv[])
 }
 
 
+
 string nonconcatwith = ")|*?+";
 string nonconcat = "(|";
 
@@ -60,6 +87,7 @@ string preprocess(string regex)
 {
     string out = "";
     int i = 0;
+    
     size_t pos;
     while ((pos = regex.find("ε")) != std::string::npos) 
         regex.replace(pos, 1, "\0");
