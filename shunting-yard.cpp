@@ -96,7 +96,10 @@ node* djkstra(string regex)
                         node* father; 
 
                         if (tempOP.priority == -1)
+                        {
                             father = b;
+                            foundOpen = true;
+                        }
                         else if (tempOP.unary)
                         {
                             father = new node();
@@ -128,9 +131,6 @@ node* djkstra(string regex)
                         {
 #if logYard
                             cout <<"Poping priority:\t";
-                            for (auto& bruh:opstack)
-                                cout << bruh.literal << "\t";
-                            cout << endl;
 #endif
                             if (opstack.empty())
                                 throw invalid_argument("Error léxico");
@@ -158,6 +158,9 @@ node* djkstra(string regex)
 
     while (!opstack.empty())
     {
+#if logYard
+        cout <<"Final pop:\t";
+#endif
         tempOP = opstack.back();
         opstack.pop_back();
 
@@ -217,6 +220,12 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
         throw invalid_argument("Error léxico");
     b = nodestack->back();
     nodestack->pop_back();
+
+#if logYard
+    for (auto& bruh: (*opstack))
+        cout << bruh.literal << "\t";
+    cout << endl;
+#endif
 
     node *father;
     if (tempOP.unary)
