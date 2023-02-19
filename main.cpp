@@ -4,12 +4,12 @@
 #include "operators.h"
 #include <string>
 #include <fstream>
-#include <cstring>
+#include <algorithm>
 
 using namespace std;
 
 
-string header = "digraph finite_state_machine {\nfontname=%f\nnode [fontname=%f]\nedge [fontname=%f]\nrankdir=LR;\nnode [shape = doublecircle]; %a;\nnode [shape = circle];\n";
+string header = "digraph finite_state_machine {\nfontname=%f\nnode [fontname=%f]\nedge [fontname=%f]\nrankdir=LR;\nnode [shape = doublecircle]; %a;\nnode [shape = point ]; qi\nnode [shape = circle];\n";
 
 string preprocess(string);
 
@@ -27,22 +27,24 @@ int main(int argc, char* argv[])
     string regex;
     getline(file, regex);
 
+    for (int i = 0; i < 32; i++)
+        regex.erase(std::remove(regex.begin(), regex.end(), (char)i), regex.end());
+
     //cout << "Input:\t\t" << regex.c_str() << "\n";
     //cout << "Preprocessor:\t" << preprocess(regex) << endl;
 
     try{
-    node* a  = djkstra(preprocess(regex));
+    node* finalTree  = djkstra(preprocess(regex));
 
-    automata *bruh = createAutomata(a);
+    automata *finalAutomata = createAutomata(finalTree);
     
-
     size_t pos;
     while ((pos = header.find("%f")) != std::string::npos) 
         header.replace(pos, 2, "\"Helvetica,Arial,sans-serif\"");
 
     
     while ((pos = header.find("%a")) != std::string::npos) 
-        header.replace(pos, 2, to_string(bruh->accept));
+        header.replace(pos, 2, to_string(finalAutomata->accept));
 
     
 
@@ -50,26 +52,30 @@ int main(int argc, char* argv[])
     string nodeformat = "%d-> %d [label = \"%c\"];\n";
     string insertion;
 
-
-    char buff[100];
-
-    for (auto& trans:bruh->gamma)
+    for (auto& trans:finalAutomata->gamma)
     {
-        memset(buff, 0, sizeof(buff));
-        sprintf(buff, nodeformat.c_str(), trans.current, trans.next, trans.character);
-        out+= buff;
+        insertion = nodeformat;
+        pos = insertion.find("%d");
+        insertion.replace(pos, 2, to_string(trans.current));
+        pos = insertion.find("%d");
+        insertion.replace(pos, 2, to_string(trans.next));
+        pos = insertion.find("%c");
+        if (trans.character)
+            insertion.replace(pos, 2, &trans.character);
+        else
+            insertion.replace(pos, 2, "ε");
+        out+= insertion;
     }
+
+    string startNodeMarker = "qi -> %s;";
+    while ((pos = startNodeMarker.find("%s")) != std::string::npos) 
+        startNodeMarker.replace(pos, 2, to_string(finalAutomata->start));
+    
+    out += startNodeMarker;
 
     out+="}";
 
     cout << out << endl;
-    
-    //cout <<"start\t"<< bruh->start
-    //<<"\taccept\t" << bruh->accept << endl;
-    //for (auto& trans:bruh->gamma)
-    //    cout << trans.current << "\t==>\t" 
-    //    << trans.character << "\t==>\t" 
-    //    << trans.next << endl;
 
     } catch(const invalid_argument& e)
     {
@@ -111,7 +117,7 @@ void postorderprint(node* root)
         postorderprint(root->leftson);
     if (root->rightson)
         postorderprint(root->rightson);
-    cout << root->character << endl;
+    cout << root->character;
 }
 
 automata* createAutomata(node* root)
