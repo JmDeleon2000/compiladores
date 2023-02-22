@@ -1,2 +1,4 @@
 *.o
 .vscode
+*.png
+!results/*.png
