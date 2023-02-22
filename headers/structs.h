@@ -15,6 +15,9 @@ struct transition
     state next;
 };
 
+constexpr bool operator==(const transition& a, const transition& b);
+
+
 struct automata
 {
     state start;

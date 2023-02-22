@@ -3,6 +3,7 @@
 #include "operators.h"
 #include <iostream>
 
+
 using namespace std;
 
 
@@ -57,6 +58,13 @@ automata* kleene (string character, automata* a, automata* b)
 }
 
 
+constexpr bool operator==(const transition& a, const transition& b)
+{
+    return a.character == b.character 
+            && a.current == b.current 
+            && a.next == b.next;
+}
+
 automata* concat (string character, automata* a, automata* b)
 {
     automata* out = new automata();
@@ -101,7 +109,9 @@ automata* concat (string character, automata* a, automata* b)
 
         new_trans.current = replaceTable[trans.current];
         new_trans.next = replaceTable[trans.next];
-        out->gamma.push_back(new_trans);
+
+        if(std::find(out->gamma.begin(), out->gamma.end(), new_trans) == out->gamma.end())
+            out->gamma.push_back(new_trans);
     }
 
     out->start = replaceTable[a->start];
