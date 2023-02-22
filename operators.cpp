@@ -134,6 +134,7 @@ automata* questionMark (string character, automata* a, automata* b)
 
     out->accept = a->accept;
 
+    
     transition epsilon;
     epsilon.character = '\0';
     epsilon.current = out->start;

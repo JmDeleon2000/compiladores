@@ -23,7 +23,7 @@ log:
 
 draw:
 	./main.o > "temp.gv.txt"
-	dot "temp.gv.txt" -Tpng:cairo:gd -Gcharset=latin1 > "graph.png"
+	dot "temp.gv.txt" -Tpng:cairo:gd -Gcharset=utf8 > "graph.png"
 	rm "temp.gv.txt"
 
 clean:

@@ -27,13 +27,20 @@ int main(int argc, char* argv[])
     string regex;
     getline(file, regex);
 
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < 33; i++)
         regex.erase(std::remove(regex.begin(), regex.end(), (char)i), regex.end());
+
+    if (regex.size() == 0)
+        {
+            cerr << "No se ingresó ninguna expresión regular" << endl;
+            return -1;
+        }
 
     //cout << "Input:\t\t" << regex.c_str() << "\n";
     //cout << "Preprocessor:\t" << preprocess(regex) << endl;
 
-    try{
+    try
+    {
     node* finalTree  = djkstra(preprocess(regex));
 
     automata *finalAutomata = createAutomata(finalTree);
@@ -101,6 +108,12 @@ string preprocess(string regex)
     while (i < regex.size())
     {
         out += regex[i];
+        if (i+1 < regex.size() &&
+            regex[i] == '(' && 
+            regex[i+1] == ')')
+                out+= '\0';
+            
+
         
         if(i+1 < regex.size() && 
             nonconcatwith.find(regex[i+1]) == -1  &&

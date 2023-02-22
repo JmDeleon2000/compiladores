@@ -1,19 +1,14 @@
 #include "shunting-yard.h"
 #include "operators.h"
+#include "errorReporting.h"
 #include <vector>
 #include <iostream>
-#include <stdexcept>
+
 
 using namespace std;
 
 void init() ;
-struct op
-{
-    definition impl;
-    int priority = 100000;
-    const char* literal;
-    bool unary = false;
-};
+
 
 #define opcount 7
 
@@ -40,22 +35,26 @@ bool getOP(char* a, op* out)
     return false;
 }
 
-inline node* doTree(op, vector<op>*, vector<node*>*);
+inline node* doTree(op, vector<op>*, vector<node*>*, string);
+
 
 
 //WIP unarios y brackets
 node* djkstra(string regex)
 {
     if (!initialized) init();
-    
+
+
     vector<op>      opstack;
     vector<node*>   nodestack;
 
     op* currentOP = new op();
     op tempOP;
     bool foundOpen;
-    for (auto& ch:regex)
+    char ch = '\0';
+    for (int i = 0; i < regex.size(); i++)
     {
+        ch = regex[i];
         if (getOP(&ch, currentOP))
         {
 #if logYard
@@ -66,7 +65,9 @@ node* djkstra(string regex)
             switch (currentOP->priority)
             {
                 case -1:
+                    currentOP->regexPosition = i;
                     opstack.push_back(*currentOP);
+                    currentOP->regexPosition = -1;
                 break;
                 case -2:
                     foundOpen = false; 
@@ -81,7 +82,7 @@ node* djkstra(string regex)
                         cout << endl;
 #endif
                         if (opstack.empty())
-                            throw invalid_argument("Error léxico");
+                            MissingOperand(tempOP, regex);
                         tempOP = opstack.back();
                         opstack.pop_back();
                         
@@ -89,7 +90,8 @@ node* djkstra(string regex)
                         node* b;
 
                         if (nodestack.empty())
-                            throw invalid_argument("Error léxico");
+                            MissingOperand(tempOP, regex);
+                        
                         b = nodestack.back();
                         nodestack.pop_back();
 
@@ -107,12 +109,14 @@ node* djkstra(string regex)
                             father->character = tempOP.literal;
                             father->impl = tempOP.impl;
                             father->leftson = b;
+                            father->regexPosition = i;
                         }
                         else 
                         {
                             father = new node();
                             if (nodestack.empty())
-                                throw invalid_argument("Error léxico");
+                                MissingOperand(tempOP, regex);
+
                             a = nodestack.back();
                             nodestack.pop_back();
 
@@ -120,8 +124,15 @@ node* djkstra(string regex)
                             father->impl = tempOP.impl;
                             father->leftson = a;
                             father->rightson = b;
+                            father->regexPosition = i;
                         }
                         nodestack.push_back(father);
+                        
+                    }
+                    if (!foundOpen)
+                    {
+                        currentOP->regexPosition = i;
+                        UnbalancedBracket(*currentOP, regex);
                     }
                 break;
                 default:
@@ -133,14 +144,17 @@ node* djkstra(string regex)
                             cout <<"Poping priority:\t";
 #endif
                             if (opstack.empty())
-                                throw invalid_argument("Error léxico");
+                                MissingOperand(tempOP, regex);
                             tempOP = opstack.back();
                             opstack.pop_back();
 
-                            node* father = doTree(tempOP, &opstack, &nodestack);
+                            node* father = doTree(tempOP, &opstack, &nodestack, regex);
                             nodestack.push_back(father);
                         }
+                    currentOP->regexPosition = i;
                     opstack.push_back(*currentOP);
+                    currentOP->regexPosition = -1;
+
                 break;
             }
         }
@@ -152,6 +166,7 @@ node* djkstra(string regex)
             node* litnode = new node();
             litnode->character = ch;
             litnode->impl = charfunc;
+            litnode->regexPosition = i;
             nodestack.push_back(litnode);
         }
     }
@@ -164,7 +179,7 @@ node* djkstra(string regex)
         tempOP = opstack.back();
         opstack.pop_back();
 
-        node* father = doTree(tempOP, &opstack, &nodestack);
+        node* father = doTree(tempOP, &opstack, &nodestack, regex);
         nodestack.push_back(father);
     }
     
@@ -211,13 +226,17 @@ void init()
     initialized = true;
 }
 
-inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
+inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack, string regex)
 {
+    if (tempOP.literal == "(")
+        UnbalancedBracket(tempOP, regex);
+    
     node* a = nullptr;
     node* b = nullptr;
 
     if (nodestack->empty())
-        throw invalid_argument("Error léxico");
+        MissingOperand(tempOP, regex);
+
     b = nodestack->back();
     nodestack->pop_back();
 
@@ -231,16 +250,18 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
     if (tempOP.unary)
     {
         father = new node();
-    
+
         father->character = tempOP.literal;
         father->impl = tempOP.impl;
         father->leftson = b;
+        father->regexPosition = tempOP.regexPosition;
     }
     else 
     {
         father = new node();
         if (nodestack->empty())
-            throw invalid_argument("Error léxico");
+            MissingOperand(tempOP, regex);
+
         a = nodestack->back();
         nodestack->pop_back();
 
@@ -248,6 +269,8 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack)
         father->impl = tempOP.impl;
         father->leftson = a;
         father->rightson = b;
+        father->regexPosition = tempOP.regexPosition;
     }
     return father;
 }
+
