@@ -1,4 +1,3 @@
 *.o
 .vscode
-*.png
-!results/*.png
+/*.png
