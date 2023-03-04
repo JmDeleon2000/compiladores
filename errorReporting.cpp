@@ -30,7 +30,7 @@ void MissingOperand(op tempOP, string regex)
     throw invalid_argument(errmsg);
 }
 
-void UnbalancedBracket  (op tempOP, std::string regex)
+void UnbalancedBracket(op tempOP, std::string regex)
 {
     string errmsg = "Paréntesis desbalanceado en posición: ";
     errmsg+= to_string(tempOP.regexPosition);

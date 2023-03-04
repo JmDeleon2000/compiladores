@@ -16,21 +16,52 @@ state getNewID()
 automata* orop (string character, automata* a, automata* b)
 {
     automata* out = new automata();
-    out->start = a->start;
-    
-    out->gamma = a->gamma;
+    out->gamma = vector<transition>();
 
-    out->accept = a->accept;
+    unordered_map<long, long> replaceTable;
+    unordered_map<long, long>::iterator it;
 
-    for (auto& trans:b->gamma)
+    replaceTable.insert({b->start,  a->start});
+    replaceTable.insert({b->accept, a->accept});
+
+    for (auto& trans: a->gamma)
     {
-        transition insertion = trans;
-        if (trans.current == b->start)
-            insertion.current = a->start;
-        if (trans.next == b->accept)
-            insertion.next = a->accept;
-        out->gamma.push_back(insertion);
+        transition new_trans = trans;
+
+        it = replaceTable.find(trans.current);
+        if (it == replaceTable.end())
+            replaceTable.insert({trans.current, trans.current});
+
+        it = replaceTable.find(trans.next);
+        if (it == replaceTable.end())
+            replaceTable.insert({trans.next, trans.next});
+
+        new_trans.current = replaceTable[trans.current];
+        new_trans.next = replaceTable[trans.next];
+        out->gamma.push_back(new_trans);
     }
+
+    for (auto& trans: b->gamma)
+    {
+        transition new_trans = trans;
+
+        it = replaceTable.find(trans.current);
+        if (it == replaceTable.end())
+            replaceTable.insert({trans.current, trans.current});
+
+        it = replaceTable.find(trans.next);
+        if (it == replaceTable.end())
+            replaceTable.insert({trans.next, trans.next});
+
+        new_trans.current = replaceTable[trans.current];
+        new_trans.next = replaceTable[trans.next];
+
+        if(std::find(out->gamma.begin(), out->gamma.end(), new_trans) == out->gamma.end())
+            out->gamma.push_back(new_trans);
+    }
+
+    out->start = replaceTable[a->start];
+    out->accept = replaceTable[b->accept];
 
     return out;
 }
@@ -150,7 +181,8 @@ automata* questionMark (string character, automata* a, automata* b)
     epsilon.current = out->start;
     epsilon.next = out->accept;
 
-    out->gamma.push_back(epsilon);
+    if(std::find(out->gamma.begin(), out->gamma.end(), epsilon) == out->gamma.end())
+        out->gamma.push_back(epsilon);
 
     return out;
 }
@@ -158,39 +190,19 @@ automata* questionMark (string character, automata* a, automata* b)
 
 automata* plusfunc (std::string character, automata* a, automata* b)
 {
-    
-    automata* a_copy = new automata();
-    
-    a_copy->gamma = vector<transition>();
+    automata* out = new automata();
 
-    unordered_map<long, long> replaceTable;
-    unordered_map<long, long>::iterator it;
+    out->accept = a->accept;
+    out->start = a->start;
+    out->gamma = a->gamma;
 
-    for (auto& trans: a->gamma)
-    {
-        transition new_trans = trans;
+    transition epsilon;
+    epsilon.character = '\0';
+    epsilon.current = out->accept;
+    epsilon.next    = out->start;
 
-        it = replaceTable.find(trans.current);
-        if (it == replaceTable.end())
-            replaceTable.insert({trans.current, getNewID()});
+    if(std::find(out->gamma.begin(), out->gamma.end(), epsilon) == out->gamma.end())
+        out->gamma.push_back(epsilon);
 
-        it = replaceTable.find(trans.next);
-        if (it == replaceTable.end())
-            replaceTable.insert({trans.next, getNewID()});
-
-        new_trans.current = replaceTable[trans.current];
-        new_trans.next = replaceTable[trans.next];
-        a_copy->gamma.push_back(new_trans);
-    }
-
-    a_copy->start = replaceTable[a->start];
-    a_copy->accept = replaceTable[a->accept];
-
-
-    automata* k = kleene("*", a_copy, 0);
-    automata* out = concat(".", a, k);
-
-    delete k;
-    delete a_copy;
     return out;
 }

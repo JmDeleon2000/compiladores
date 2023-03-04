@@ -35,14 +35,17 @@ int main(int argc, char* argv[])
             cerr << "No se ingresó ninguna expresión regular" << endl;
             return -1;
         }
-
-    //cout << "Input:\t\t" << regex.c_str() << "\n";
-    //cout << "Preprocessor:\t" << preprocess(regex) << endl;
+#if logYard
+    cout << "Input:\t\t" << regex.c_str() << "\n";
+    cout << "Preprocessor:\t" << preprocess(regex) << endl;
+#endif
 
     try
     {
     node* finalTree  = djkstra(preprocess(regex));
-
+#if logYard
+    postorderprint(finalTree);
+#endif
     automata *finalAutomata = createAutomata(finalTree);
     
     size_t pos;
@@ -82,8 +85,11 @@ int main(int argc, char* argv[])
 
     out+="}";
 
-    cout << out << endl;
+#if logYard
 
+#else
+    cout << out << endl;
+#endif
     } catch(const invalid_argument& e)
     {
         cerr << e.what() << endl;

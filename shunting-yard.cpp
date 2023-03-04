@@ -141,7 +141,14 @@ node* djkstra(string regex)
                         opstack.back().priority >= currentOP->priority) //el actual tiene menor presedencia
                         {
 #if logYard
-                            cout <<"Poping priority:\t";
+                            cout <<"Poping priority:\t"
+                            << currentOP->literal << "\t"
+                            << currentOP->priority << "\tstack:\t";
+
+                            for (auto& bruh: opstack)
+                                cout << bruh.literal << "\t";
+                            cout << endl;
+
 #endif
                             if (opstack.empty())
                                 MissingOperand(tempOP, regex);
@@ -175,6 +182,9 @@ node* djkstra(string regex)
     {
 #if logYard
         cout <<"Final pop:\t";
+        for (auto& bruh: opstack)
+            cout << bruh.literal << "\t";
+        cout << endl;
 #endif
         tempOP = opstack.back();
         opstack.pop_back();
@@ -240,11 +250,6 @@ inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack, st
     b = nodestack->back();
     nodestack->pop_back();
 
-#if logYard
-    for (auto& bruh: (*opstack))
-        cout << bruh.literal << "\t";
-    cout << endl;
-#endif
 
     node *father;
     if (tempOP.unary)
