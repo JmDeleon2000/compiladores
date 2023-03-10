@@ -12,10 +12,10 @@ void init() ;
 
 #define opcount 7
 
-op ops[opcount];
+op_thompson ops[opcount];
 bool initialized = false;
 
-bool getOP(char* a, op* out)
+bool getOP_thompson(char* a, op_thompson* out)
 {
     int j;
     for (int i = 0; i < opcount; i++)
@@ -35,27 +35,27 @@ bool getOP(char* a, op* out)
     return false;
 }
 
-inline node* doTree(op, vector<op>*, vector<node*>*, string);
+inline node* doTree(op_thompson, vector<op_thompson>*, vector<node*>*, string);
 
 
 
-//WIP unarios y brackets
-node* djkstra(string regex)
+
+node* djkstra_thompson(string regex)
 {
     if (!initialized) init();
 
 
-    vector<op>      opstack;
+    vector<op_thompson>      opstack;
     vector<node*>   nodestack;
 
-    op* currentOP = new op();
-    op tempOP;
+    op_thompson* currentOP = new op_thompson();
+    op_thompson tempOP;
     bool foundOpen;
     char ch = '\0';
     for (int i = 0; i < regex.size(); i++)
     {
         ch = regex[i];
-        if (getOP(&ch, currentOP))
+        if (getOP_thompson(&ch, currentOP))
         {
 #if logYard
             cout << "Current OP:\t" << currentOP->literal 
@@ -236,7 +236,7 @@ void init()
     initialized = true;
 }
 
-inline node* doTree(op tempOP, vector<op>* opstack, vector<node*>* nodestack, string regex)
+inline node* doTree(op_thompson tempOP, vector<op_thompson>* opstack, vector<node*>* nodestack, string regex)
 {
     if (tempOP.literal == "(")
         UnbalancedBracket(tempOP, regex);

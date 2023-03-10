@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     try
     {
-    node* finalTree  = djkstra(preprocess(regex));
+    node* finalTree  = djkstra_thompson(preprocess(regex));
 #if logYard
     postorderprint(finalTree);
 #endif

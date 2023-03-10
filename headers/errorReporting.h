@@ -2,5 +2,5 @@
 #include "structs.h"
 #include <string>
 
-void MissingOperand     (op tempOP, std::string regex);
-void UnbalancedBracket  (op tempOP, std::string regex);
+void MissingOperand     (op_thompson tempOP, std::string regex);
+void UnbalancedBracket  (op_thompson tempOP, std::string regex);

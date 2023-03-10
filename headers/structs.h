@@ -36,7 +36,7 @@ struct node
     node* rightson;
 };
 
-struct op
+struct op_thompson
 {
     definition impl;
     int priority = 100000;

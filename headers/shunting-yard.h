@@ -2,4 +2,4 @@
 #include "structs.h"
 #include <string>
 
-node* djkstra(std::string regex);
+node* djkstra_thompson(std::string regex);
