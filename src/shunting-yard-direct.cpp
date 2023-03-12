@@ -7,13 +7,13 @@
 
 using namespace std;
 
-void init() ;
+void init_dir();
 
 
 #define opcount 7
 
-op_direct ops[opcount];
-bool initialized = false;
+op_direct ops_direct[opcount];
+bool initialized_dir = false;
 
 bool getOP_direct(char* a, op_direct* out)
 {
@@ -21,16 +21,16 @@ bool getOP_direct(char* a, op_direct* out)
     for (int i = 0; i < opcount; i++)
     {
         j = 0;
-        while (ops[i].literal[j] == a[j]) //mientras sean iguales
+        while (ops_direct[i].literal[j] == a[j]) //mientras sean iguales
         {
             j++;
 
-            out->nullable = ops[i].nullable;
-            out->first_pos = ops[i].first_pos;
-            out->last_pos = ops[i].last_pos;
-            out->literal = ops[i].literal;
-            out->priority = ops[i].priority;
-            out->unary = ops[i].unary;
+            out->nullable = ops_direct[i].nullable;
+            out->first_pos = ops_direct[i].first_pos;
+            out->last_pos = ops_direct[i].last_pos;
+            out->literal = ops_direct[i].literal;
+            out->priority = ops_direct[i].priority;
+            out->unary = ops_direct[i].unary;
             return true;
         }
     }
@@ -44,7 +44,7 @@ inline node_direct* doTree(op_direct, vector<op_direct>*, vector<node_direct*>*,
 
 node_direct* djkstra_direct(string regex)
 {
-    if (!initialized) init();
+    if (!initialized_dir) init_dir();
 
 
     vector<op_direct>      opstack;
@@ -207,55 +207,55 @@ node_direct* djkstra_direct(string regex)
 // operators        = "*?.|";
 // openBrackets     = "(";
 // ClosingBrackets  = ")";
-void init() 
+void init_dir() 
 {
-    ops[0].literal  = "|";
-    ops[0].priority = 1;
-    ops[0].nullable = or_null;
-    ops[0].first_pos = or_first;
-    ops[0].last_pos = or_last;
+    ops_direct[0].literal  = "|";
+    ops_direct[0].priority = 1;
+    ops_direct[0].nullable = or_null;
+    ops_direct[0].first_pos = or_first;
+    ops_direct[0].last_pos = or_last;
 
-    ops[1].literal  = ".";
-    ops[1].priority = 3;
-    ops[1].nullable = concat_null;
-    ops[1].first_pos = concat_first;
-    ops[1].last_pos = concat_last;
+    ops_direct[1].literal  = ".";
+    ops_direct[1].priority = 3;
+    ops_direct[1].nullable = concat_null;
+    ops_direct[1].first_pos = concat_first;
+    ops_direct[1].last_pos = concat_last;
 
-    ops[2].literal  = "?";
-    ops[2].priority = 4;
-    ops[2].nullable = qmark_null;
-    ops[2].first_pos = qmark_first;
-    ops[2].last_pos = qmark_last;
-    ops[2].unary = true;
+    ops_direct[2].literal  = "?";
+    ops_direct[2].priority = 4;
+    ops_direct[2].nullable = qmark_null;
+    ops_direct[2].first_pos = qmark_first;
+    ops_direct[2].last_pos = qmark_last;
+    ops_direct[2].unary = true;
 
-    ops[3].literal  = "*";
-    ops[3].priority = 4;    
-    ops[3].nullable = kleene_null;
-    ops[3].first_pos = kleene_first;
-    ops[3].last_pos = kleene_last;
-    ops[3].unary = true;
+    ops_direct[3].literal  = "*";
+    ops_direct[3].priority = 4;    
+    ops_direct[3].nullable = kleene_null;
+    ops_direct[3].first_pos = kleene_first;
+    ops_direct[3].last_pos = kleene_last;
+    ops_direct[3].unary = true;
 
-    ops[4].literal  = "+";
-    ops[4].priority =  4;
-    ops[4].nullable = positive_null;
-    ops[4].first_pos = positive_first;
-    ops[4].last_pos = positive_last;
-    ops[4].unary = true;
+    ops_direct[4].literal  = "+";
+    ops_direct[4].priority =  4;
+    ops_direct[4].nullable = positive_null;
+    ops_direct[4].first_pos = positive_first;
+    ops_direct[4].last_pos = positive_last;
+    ops_direct[4].unary = true;
 
-    ops[5].literal  = "(";
-    ops[5].priority = -1;
-    ops[5].nullable = 0;
-    ops[5].first_pos = 0;
-    ops[5].last_pos = 0;
+    ops_direct[5].literal  = "(";
+    ops_direct[5].priority = -1;
+    ops_direct[5].nullable = 0;
+    ops_direct[5].first_pos = 0;
+    ops_direct[5].last_pos = 0;
 
-    ops[6].literal  = ")";
-    ops[6].priority = -2;
-    ops[6].nullable = 0;
-    ops[6].first_pos = 0;
-    ops[6].last_pos = 0;
+    ops_direct[6].literal  = ")";
+    ops_direct[6].priority = -2;
+    ops_direct[6].nullable = 0;
+    ops_direct[6].first_pos = 0;
+    ops_direct[6].last_pos = 0;
 
 
-    initialized = true;
+    initialized_dir = true;
 }
 
 inline node_direct* doTree(op_direct tempOP, vector<op_direct>* opstack, vector<node_direct*>* nodestack, string regex)

@@ -14,6 +14,7 @@ string header = "digraph finite_state_machine {\nfontname=%f\nnode [fontname=%f]
 string preprocess(string);
 
 void postorderprint(node*);
+void postorderdirectprint(node_direct*);
 automata* createAutomata(node*);
 
 
@@ -156,4 +157,21 @@ automata* createAutomata(node* root)
         delete right;
 
     return out;
+}
+
+
+void postorderdirectprint(node_direct* root)
+{
+    if (root->leftson)
+        postorderdirectprint(root->leftson);
+    if (root->rightson)
+        postorderdirectprint(root->rightson);
+    cout << "{";
+    for (auto& ele:root->first_pos)
+        cout << ele << " ";
+    cout << "} \t";
+    cout << root->character << " \t{";
+    for (auto& ele:root->last_pos)
+        cout << ele << " ";
+    cout << "} \n";
 }

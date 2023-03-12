@@ -14,12 +14,12 @@ PERMISSIVE = -Wwrite-strings
 
 compile:
 	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE}
+	${CC}  main.cpp src/*.cpp  -o main.o ${STANDARD} ${INCLUDE}
 
 
 log:
 	@echo "Compile..."
-	${CC}  *.cpp  -o main.o ${STANDARD} ${INCLUDE} -D logYard
+	${CC}  main.cpp src/*.cpp -o main.o ${STANDARD} ${INCLUDE} -D logYard
 
 draw:
 	./main.o > "temp.gv.txt"
